@@ -154,3 +154,135 @@ List *slist_delete_tail(List *list)
     }
     return list;
 }
+
+List *slist_add_on_data(List *list, int32_t key, int32_t data)
+{
+    if (list->head != NULL)
+    {
+        Node *cur = list->head;
+        Node *node = __list_node_new__(data);
+        for (; cur != NULL && cur->data != key; cur = cur->next)
+            ;
+        if (cur != NULL)
+        {
+            node->next = cur->next;
+            cur->next = node;
+            if (node->next == NULL)
+            {
+                list->tail = node;
+            }
+        }
+        ++list->length;
+    }
+    return list;
+}
+
+List *slist_delete_on_data(List *list, int32_t data)
+{
+    if (list->head != NULL)
+    {
+        Node *cur, *p;
+        cur = list->head;
+        // deleting the head node if "data" match
+        if (cur->data == data)
+        {
+            list->head = cur->next;
+        }
+        else
+        {
+            p = cur;
+            cur = cur->next;
+            while (cur != NULL)
+            {
+                if (cur->data == data)
+                {
+                    p->next = cur->next;
+                }
+                else
+                {
+                    p = cur;
+                    cur = cur->next;
+                }
+            }
+            if (cur == list->tail)
+            {
+                list->tail = p;
+            }
+        }
+        if (list->head == NULL)
+        {
+            list->tail = NULL;
+        }
+        free(cur);
+        --list->length;
+    }
+}
+
+/*
+Ques -
+Code to find the largest and smallest in the given Linked List
+*/
+
+List *slist_reverse(List *list)
+{
+    Node *prev = NULL;
+    Node *current = list->head;
+    Node *next = NULL;
+
+    list->tail = list->head; // points to the first
+
+    while (current != NULL)
+    {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    list->head = prev; // point to end
+}
+
+/*
+Ques-
+Find nth element from end after reversing the slist
+*/
+
+/*
+Ques-
+Delete all duplicate elements from SList
+Sol-
+Compare the 1st element with all rest elements one by one > delete any matching you find > then iterate from teh 1st element to 2nd, repeat and so on.
+*/
+
+/*
+Ques-
+Find the middle node of the slist
+*/
+
+/*
+Ques-
+Check if a cycle exists in the slist
+*/
+
+List *slist_check_cycle(List *list)
+{
+    // Node *slow = *head;
+    // Node *fast = *head;
+    Node *slow = list->head;
+    Node *fast = list->head;
+
+    while (fast != NULL && fast->next != NULL)
+    {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast)
+        {
+            return 1; // Cycle detected
+        }
+    }
+    return 0;
+}
+
+/*
+Ques-
+Program ro store student data in a Singly Linked List
+*/
