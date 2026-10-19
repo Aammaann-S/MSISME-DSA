@@ -23,11 +23,15 @@ uint32_t slist_length(const List *list)
     return list->length;
 }
 
+/*
+Free the node list free/ freeze the memory allocated for each node& for the linked list structure itself.
+the list descripter lives on till the list destroy function is called
+*/
 // Purpose : delete the entire linked list and release its memory
 List *slist_free(List *list)
 {
 
-    Node *cur, *p; // temporary pointers
+    Node *cur, *temp; // temporary pointers
 
     if (slist_length(list) > 0)
     {
@@ -41,13 +45,15 @@ List *slist_free(List *list)
 
         while (cur != NULL)
         {
-            p = cur;
+            temp = cur;
             cur = cur->next;
-            free(p);
+            free(temp);
             --list->length; // after deletion of a(each) node this part decreses the length
         }
     }
-    return list;
+    free(list);
+    return NULL;
+    // return list;
 }
 
 /*
