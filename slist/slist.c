@@ -9,7 +9,7 @@
 static int32_t min_value = INT32_MAX;
 static int32_t max_value = INT32_MIN;
 
-int32_t slist_get_min(const List *list)
+int32_t slist_get_min_value(const List *list)
 {
     if (list == NULL || list->length == 0)
         return 0;
@@ -17,12 +17,23 @@ int32_t slist_get_min(const List *list)
     return min_value;
 }
 
-int32_t slist_get_max(const List *list)
+int32_t slist_get_max_value(const List *list)
 {
     if (list == NULL || list->length == 0)
         return 0;
 
     return max_value;
+}
+
+/*
+Helper internal function to allocate node that hold data
+*/
+static Node *__list_node_new__(int32_t data)
+{
+    Node *node = (Node *)malloc(sizeof(Node));
+    node->data = data;
+    node->next = NULL;
+    return node;
 }
 
 List *slist_new()
@@ -76,15 +87,17 @@ List *slist_free(List *list)
     // return list;
 }
 
-/*
-Helper internal function to allocate node that hold data
-*/
-static Node *__list_node_new__(int32_t data)
+uint32_t slist_lookup(const List *list, int32_t key)
 {
-    Node *node = (Node *)malloc(sizeof(Node));
-    node->data = data;
-    node->next = NULL;
-    return node;
+    Node *node = list->head;
+    for (node = list->head; node != NULL; node = node->next)
+    {
+        if (node->data == key)
+        {
+            break;
+        }
+    }
+    return (node != NULL); // gives true(1)/false(0)
 }
 
 /*
@@ -108,19 +121,6 @@ List *slist_add_head(List *list, int32_t data)
         (list->length == 1 && list->head == list->tail) ||
         (list->length > 0 && list->head != list->tail));
     return list;
-}
-
-uint32_t slist_lookup(const List *list, int32_t key)
-{
-    Node *node = list->head;
-    for (node = list->head; node != NULL; node = node->next)
-    {
-        if (node->data == key)
-        {
-            break;
-        }
-    }
-    return (node != NULL); // gives true(1)/false(0)
 }
 
 // List *slist_add_tail(List *list, int32_t data)
