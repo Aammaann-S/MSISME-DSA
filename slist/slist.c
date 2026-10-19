@@ -5,6 +5,26 @@
 #include <stdlib.h> // need this for malloc?
 #include "slist.h"
 
+// Lab Assiginment - Ques-4
+static int32_t min_value = INT32_MAX;
+static int32_t max_value = INT32_MIN;
+
+int32_t slist_get_min(const List *list)
+{
+    if (list == NULL || list->length == 0)
+        return 0;
+
+    return min_value;
+}
+
+int32_t slist_get_max(const List *list)
+{
+    if (list == NULL || list->length == 0)
+        return 0;
+
+    return max_value;
+}
+
 List *slist_new()
 {
     List *list; // list is a pointer // this only creates a pointer List object not created yet
@@ -103,8 +123,28 @@ uint32_t slist_lookup(const List *list, int32_t key)
     return (node != NULL); // gives true(1)/false(0)
 }
 
+// List *slist_add_tail(List *list, int32_t data)
+// {
+//     Node *node = __list_node_new__(data);
+//     if (list->tail != NULL)
+//     {
+//         list->tail->next = node;
+//         list->tail = node;
+//     }
+//     else
+//     {
+//         list->head = list->tail = node;
+//     }
+//     ++list->length;
+//     return list;
+// }
+
+// Updated for :
+// Lab Assiginment - Ques-4
 List *slist_add_tail(List *list, int32_t data)
 {
+    if (list == NULL)
+        return NULL;
     Node *node = __list_node_new__(data);
     if (list->tail != NULL)
     {
@@ -115,6 +155,21 @@ List *slist_add_tail(List *list, int32_t data)
     {
         list->head = list->tail = node;
     }
+
+    if (list->length == 0)
+    {
+        min_value = data;
+        max_value = data;
+    }
+    else
+    {
+        if (data < min_value)
+            min_value = data;
+
+        if (data > max_value)
+            max_value = data;
+    }
+
     ++list->length;
     return list;
 }
@@ -308,15 +363,15 @@ int32_t slist_nth_from_end(List *list, int32_t n)
 }
 
 /*
-Task -
+Lab Assiginment - Ques-5
 Delete all duplicate elements from SList
 Sol-
 Compare the 1st element (current) with all rest elements one by one > delete any matching you find > then iterate current from the 1st element to 2nd, repeat and so on.
 */
-List *slist_remove_duplicates(List *list)
+List *slist_delete_duplicates(List *list)
 {
-    if (list == NULL)
-        return NULL;
+    if (list == NULL || list->head == NULL)
+        return list;
 
     Node *current = list->head;
 
@@ -348,7 +403,7 @@ List *slist_remove_duplicates(List *list)
 }
 
 /*
-Ques-
+Task-
 Find the middle node of the slist
 */
 Node *slist_middle(List *list)
@@ -370,7 +425,7 @@ Node *slist_middle(List *list)
 }
 
 /*
-Ques-
+Task-
 Check if a cycle exists in the slist
 */
 List *slist_check_cycle(List *list)

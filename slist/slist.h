@@ -56,4 +56,8 @@ List *slist_add_tail(List *list, int32_t data);
 List *slist_delete_head(List *list);
 List *slist_delete_tail(List *list);
 
+// Lab Assiginment - Ques-4
+int32_t slist_get_min(const List *list);
+int32_t slist_get_max(const List *list);
+
 #endif
