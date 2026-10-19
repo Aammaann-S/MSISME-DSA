@@ -173,8 +173,8 @@ List *slist_add_on_data(List *list, int32_t key, int32_t data)
             {
                 list->tail = node;
             }
+            ++list->length;
         }
-        ++list->length;
     }
     return list;
 }
@@ -221,12 +221,51 @@ List *slist_delete_on_data(List *list, int32_t data)
 }
 
 /*
-Ques -
+Task -
 Code to find the largest and smallest in the given Linked List
+(Bubble Sort Approach)
 */
+int32_t slist_largest(List *list)
+{
+    assert(list != NULL);
+    assert(list->head != NULL);
+
+    int32_t largest = list->head->data;
+    Node *temp = list->head;
+
+    while (temp != NULL)
+    {
+        if (temp->data > largest)
+            largest = temp->data;
+
+        temp = temp->next;
+    }
+    return largest;
+}
+
+int32_t slist_smallest(List *list)
+{
+    assert(list != NULL);
+    assert(list->head != NULL);
+
+    int32_t smallest = list->head->data;
+    Node *temp = list->head;
+
+    while (temp != NULL)
+    {
+        if (temp->data < smallest)
+            smallest = temp->data;
+
+        temp = temp->next;
+    }
+    return smallest;
+}
 
 List *slist_reverse(List *list)
 {
+    if (list == NULL)
+        return NULL;
+
     Node *prev = NULL;
     Node *current = list->head;
     Node *next = NULL;
@@ -245,21 +284,84 @@ List *slist_reverse(List *list)
 }
 
 /*
-Ques-
-Find nth element from end after reversing the slist
+Find nth element from end after reversing the slist (Theory Ass Ques-5)
 */
+int32_t slist_nth_from_end(List *list, int32_t n)
+{
+    Node *temp;
+
+    assert(list != NULL);
+    assert(n > 0);
+    assert(n <= list->length);
+
+    slist_reverse(list);
+
+    int32_t pos = ((list->length) - n + 1);
+    temp = slist_get_on_position(list, pos);
+    return temp->data;
+}
 
 /*
-Ques-
+Task -
 Delete all duplicate elements from SList
 Sol-
-Compare the 1st element with all rest elements one by one > delete any matching you find > then iterate from teh 1st element to 2nd, repeat and so on.
+Compare the 1st element (current) with all rest elements one by one > delete any matching you find > then iterate current from the 1st element to 2nd, repeat and so on.
 */
+List *slist_remove_duplicates(List *list)
+{
+    if (list == NULL)
+        return NULL;
+
+    Node *current = list->head;
+
+    while (current != NULL)
+    {
+        Node *prev = current;
+        Node *temp = current->next;
+        while (temp != NULL)
+        {
+            if (temp->data == current->data)
+            {
+                prev->next = temp->next;
+                if (temp == list->tail)
+                    list->tail = prev;
+                free(temp);
+                temp = prev->next;
+                list->length--;
+            }
+            else
+            {
+                prev = temp;
+                temp = temp->next;
+            }
+        }
+        current = current->next;
+    }
+
+    return list;
+}
 
 /*
 Ques-
 Find the middle node of the slist
 */
+Node *slist_middle(List *list)
+{
+    if (list == NULL)
+        return NULL;
+
+    Node *slow = list->head;
+    Node *fast = list->head;
+
+    while (fast != NULL && fast->next != NULL)
+    {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    // logic - slow reaches middle when fast reaches end
+
+    return slow;
+}
 
 /*
 Ques-
@@ -267,8 +369,9 @@ Check if a cycle exists in the slist
 */
 List *slist_check_cycle(List *list)
 {
-    // Node *slow = *head;
-    // Node *fast = *head;
+    if (list == NULL)
+        return 0;
+
     Node *slow = list->head;
     Node *fast = list->head;
 
@@ -285,18 +388,15 @@ List *slist_check_cycle(List *list)
 }
 
 /*
-Ques-
-Program to store student data in a Singly Linked List
-*/
-
-/*
-Program to return an element att a given position in a Singly Linked List
+Program to return an element at a given position in a Singly Linked List
 */
 Node *slist_get_on_position(List *list, int32_t pos)
 {
-    Node *temp = list->head;
-    int32_t count = 1;
     assert(list->length >= pos);
+
+    int32_t count = 1;
+    Node *temp = list->head;
+
     while (count != pos)
     {
         temp = temp->next;
@@ -305,8 +405,24 @@ Node *slist_get_on_position(List *list, int32_t pos)
     return temp;
 }
 
+Node *slist_get_on_position_V2(List *list, int32_t pos)
+{
+    if (list == NULL || pos < 1 || (uint32_t)pos > list->length)
+        return NULL;
+
+    Node *temp = list->head;
+
+    for (int32_t i = 1;
+         i < pos;
+         //  i++
+         i++, temp = temp->next)
+        ;
+    // temp = temp->next;
+    return temp;
+}
+
 /*
-Assiginment -
+Task -
 Program to remove an element at a given position in a Singly Linked List
 */
 List *slist_remove_on_position(List *list, int32_t pos)
@@ -354,54 +470,162 @@ List *slist_remove_on_position(List *list, int32_t pos)
     }
 }
 
+List *slist_remove_on_position_V2(List *list, int32_t pos)
+{
+    if (list == NULL || pos < 1 ||
+        (uint32_t)pos > list->length)
+        return list;
+
+    Node *temp = list->head;
+
+    if (pos == 1)
+    {
+        list->head = temp->next;
+        if (list->head == NULL)
+            list->tail = NULL;
+        free(temp);
+        list->length--;
+        return list;
+    }
+
+    Node *prev = list->head;
+    for (int32_t i = 1;
+         i < pos - 1;
+         //  i++
+         i++, temp = temp->next)
+        ;
+    // prev = prev->next;
+
+    temp = prev->next;
+    prev->next = temp->next;
+    if (temp == list->tail)
+        list->tail = prev;
+    free(temp);
+    list->length--;
+
+    return list;
+}
+
 /*
-Assiginment -
+Theory Assiginment - Ques-3
 Program to Write program to find the union and intersection of 2 Singly Linked Lists. The resultant list elements should be unique
 */
+List *slist_union(List *list_1, List *list_2)
+{
+    if (list_1 == NULL || list_2 == NULL)
+        return NULL;
+
+    Node *temp;
+    List *result = slist_new();
+
+    for (temp = list_1->head; temp != NULL; temp = temp->next)
+    {
+        if (slist_lookup(result, temp->data) == 0)
+            slist_add_tail(result, temp->data);
+    }
+    for (temp = list_2->head; temp != NULL; temp = temp->next)
+    {
+        if (slist_lookup(result, temp->data) == 0)
+            slist_add_tail(result, temp->data);
+    }
+    return result;
+}
+
+List *slist_intersection(List *list_1, List *list_2)
+{
+    if (list_1 == NULL || list_2 == NULL)
+        return NULL;
+
+    Node *temp;
+    List *result = slist_new();
+
+    for (temp = list_1->head; temp != NULL; temp = temp->next)
+    {
+        if (slist_lookup(list_2, temp->data) != 0 &&
+            slist_lookup(result, temp->data) == 0)
+        {
+            slist_add_tail(result, temp->data);
+        }
+    }
+    return result;
+}
 
 /*
-Assiginment -
+Task -
 Program to compare 2 Singly Linked Lists, find the difference between the 2 singly linked lists
 */
+List *slist_difference(List *a, List *b)
+{
+    if (a == NULL || b == NULL)
+        return NULL;
+
+    List *result = slist_new();
+
+    if (result == NULL)
+        return NULL;
+
+    Node *temp;
+
+    for (temp = a->head; temp != NULL; temp = temp->next)
+    {
+        if (slist_lookup(b, temp->data) == 0 &&
+            slist_lookup(result, temp->data) == 0)
+        {
+            slist_add_tail(result, temp->data);
+        }
+    }
+    return result;
+}
+
+int slist_compare(List *a, List *b)
+{
+    if (a == NULL || b == NULL)
+        return a == b;
+
+    if (a->length != b->length)
+        return 0;
+
+    Node *p = a->head;
+    Node *q = b->head;
+
+    while (p != NULL && q != NULL)
+    {
+        if (p->data != q->data)
+            return 0;
+
+        p = p->next;
+        q = q->next;
+    }
+    return 1;
+}
 
 /*
-Assiginment -
+Task -
 Program for Implementing STACK using singly linked lists
 */
 
-// // List *stack_add(List *list, int32_t item)
-// void *stack_add(List *list, int32_t item)
-// {
+List *stack_push(List *stack, int32_t item)
+{
+    if (stack == NULL)
+        return NULL;
+    return slist_add_head(stack, item);
+}
 
-//     Node *temp = __list_node_new__(item);
-//     if (temp != NULL)
-//     {
-//         temp->next = list->head;
-//         list->head = temp;
-//         // return true;
-//     }
-//     else
-//     {
-//         printf("Stack Out of Space");
-//         // return false;
-//     }
-// }
+int stack_pop(List *stack, int32_t *item)
+{
+    if (stack == NULL || stack->head == NULL || item == NULL)
+        return 0;
 
-// // List *stack_add(List *list, int32_t item)
-// void *stack_delete(List *list)
-// {
+    *item = stack->head->data;
+    slist_delete_head(stack);
+    return 1;
+}
 
-//     Node *temp = list->head;
-//     if (list->head = NULL)
-//     {
-//         printf("Stack Empty");
-//         // return false;
-//     }
-//     else
-//     {
-//         item = temp->data;
-//         list->head = temp->next;
-//         slist_delete_head(list);
-//         // return true;
-//     }
-// }
+int stack_peek(List *stack, int32_t *item)
+{
+    if (stack == NULL || stack->head == NULL || item == NULL)
+        return 0;
+
+    *item = stack->head->data;
+    return 1;
+}
