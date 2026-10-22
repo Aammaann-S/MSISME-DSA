@@ -30,15 +30,15 @@ struct _student_list_
 };
 
 StList *stlist_new();
-StList *stlist_free(StList *);
+StList *stlist_free(StList *list);
 
 // uint32_t stlist_length(const StList *list);
 // uint32_t stlist_lookup(const StList *list, int32_t data);
 // StList *stlist_add_head(StList *list, int32_t data);
 // StList *stlist_delete_head(StList *list);
 
-StList *stlist_add_tail(StList *, uint32_t, const char *, float, float);
-StList *stlist_delete_on_roll_no(StList *, uint32_t);
+StList *stlist_add_tail(StList *list, uint32_t roll_no, const char *name, float marks1, float marks2);
+StList *stlist_delete_on_roll_no(StList *list, uint32_t roll_no);
 // StList *stlist_delete_tail(StList *list);
 
 #endif

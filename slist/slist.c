@@ -5,24 +5,67 @@
 #include <stdlib.h> // need this for malloc?
 #include "slist.h"
 
-// Lab Assiginment - Ques-4
+// Lab Assignment - Ques-4
 static int32_t min_value = INT32_MAX;
 static int32_t max_value = INT32_MIN;
 
+// int32_t slist_get_min_value(const List *list)
+// {
+//     if (list == NULL || list->length == 0)
+//         return 0;
+
+//     return min_value;
+// }
+
+// int32_t slist_get_max_value(const List *list)
+// {
+//     if (list == NULL || list->length == 0)
+//         return 0;
+
+//     return max_value;
+// }
+
+// Lab Assignment - Ques-4
 int32_t slist_get_min_value(const List *list)
 {
-    if (list == NULL || list->length == 0)
-        return 0;
+    assert(list != NULL);
 
-    return min_value;
+    if (list->head == NULL)
+        return 0; // Empty-list convention
+
+    int32_t min = list->head->data;
+    Node *current = list->head;
+
+    while (current != NULL)
+    {
+        if (current->data < min)
+            min = current->data;
+
+        current = current->next;
+    }
+
+    return min;
 }
 
 int32_t slist_get_max_value(const List *list)
 {
-    if (list == NULL || list->length == 0)
-        return 0;
+    assert(list != NULL);
 
-    return max_value;
+    if (list->head == NULL)
+        return 0; // Empty-list convention
+
+    int32_t max = list->head->data;
+    Node *current = list->head;
+
+    while (current != NULL)
+    {
+        if (current->data > max)
+            max = current->data;
+
+        current = current->next;
+    }
+
+    return max;
 }
 
 /*
@@ -31,6 +74,9 @@ Helper internal function to allocate node that hold data
 static Node *__list_node_new__(int32_t data)
 {
     Node *node = (Node *)malloc(sizeof(Node));
+
+    if (node == NULL)
+        return NULL;
     node->data = data;
     node->next = NULL;
     return node;
@@ -140,7 +186,7 @@ List *slist_add_head(List *list, int32_t data)
 // }
 
 // Updated for :
-// Lab Assiginment - Ques-4
+// Lab Assignment - Ques-4
 List *slist_add_tail(List *list, int32_t data)
 {
     if (list == NULL)
@@ -154,20 +200,6 @@ List *slist_add_tail(List *list, int32_t data)
     else
     {
         list->head = list->tail = node;
-    }
-
-    if (list->length == 0)
-    {
-        min_value = data;
-        max_value = data;
-    }
-    else
-    {
-        if (data < min_value)
-            min_value = data;
-
-        if (data > max_value)
-            max_value = data;
     }
 
     ++list->length;
@@ -242,43 +274,35 @@ List *slist_add_on_data(List *list, int32_t key, int32_t data)
 
 List *slist_delete_on_data(List *list, int32_t data)
 {
-    if (list->head != NULL)
+    if (list == NULL)
+        return NULL;
+
+    Node *current = list->head;
+    Node *previous = NULL;
+
+    while (current != NULL)
     {
-        Node *cur, *p;
-        cur = list->head;
-        // deleting the head node if "data" match
-        if (cur->data == data)
+        if (current->data == data)
         {
-            list->head = cur->next;
+            if (previous == NULL)
+                list->head = current->next;
+            else
+                previous->next = current->next;
+
+            if (current == list->tail)
+                list->tail = previous;
+
+            free(current);
+            list->length--;
+
+            return list; // Delete only the first match
         }
-        else
-        {
-            p = cur;
-            cur = cur->next;
-            while (cur != NULL)
-            {
-                if (cur->data == data)
-                {
-                    p->next = cur->next;
-                }
-                else
-                {
-                    p = cur;
-                    cur = cur->next;
-                }
-            }
-            if (cur == list->tail)
-            {
-                list->tail = p;
-            }
-        }
-        if (list->head == NULL)
-        {
-            list->tail = NULL;
-        }
-        free(cur);
-        --list->length;
+
+        previous = current;
+        current = current->next;
     }
+
+    return list;
 }
 
 /*
@@ -363,7 +387,7 @@ int32_t slist_nth_from_end(List *list, int32_t n)
 }
 
 /*
-Lab Assiginment - Ques-5
+Lab Assignment - Ques-5
 Delete all duplicate elements from SList
 Sol-
 Compare the 1st element (current) with all rest elements one by one > delete any matching you find > then iterate current from the 1st element to 2nd, repeat and so on.
@@ -428,7 +452,7 @@ Node *slist_middle(List *list)
 Task-
 Check if a cycle exists in the slist
 */
-List *slist_check_cycle(List *list)
+int *slist_check_cycle(List *list)
 {
     if (list == NULL)
         return 0;
@@ -537,38 +561,31 @@ List *slist_remove_on_position_V2(List *list, int32_t pos)
         (uint32_t)pos > list->length)
         return list;
 
-    Node *temp = list->head;
+    Node *current = list->head;
+    Node *previous = NULL;
 
-    if (pos == 1)
+    for (int32_t i = 1; i < pos; i++)
     {
-        list->head = temp->next;
-        if (list->head == NULL)
-            list->tail = NULL;
-        free(temp);
-        list->length--;
-        return list;
+        previous = current;
+        current = current->next;
     }
 
-    Node *prev = list->head;
-    for (int32_t i = 1;
-         i < pos - 1;
-         //  i++
-         i++, temp = temp->next)
-        ;
-    // prev = prev->next;
+    if (previous == NULL)
+        list->head = current->next;
+    else
+        previous->next = current->next;
 
-    temp = prev->next;
-    prev->next = temp->next;
-    if (temp == list->tail)
-        list->tail = prev;
-    free(temp);
+    if (current == list->tail)
+        list->tail = previous;
+
+    free(current);
     list->length--;
 
     return list;
 }
 
 /*
-Theory Assiginment - Ques-3
+Theory Assignment - Ques-3
 Program to Write program to find the union and intersection of 2 Singly Linked Lists. The resultant list elements should be unique
 */
 List *slist_union(List *list_1, List *list_2)
@@ -602,8 +619,7 @@ List *slist_intersection(List *list_1, List *list_2)
 
     for (temp = list_1->head; temp != NULL; temp = temp->next)
     {
-        if (slist_lookup(list_2, temp->data) != 0 &&
-            slist_lookup(result, temp->data) == 0)
+        if (slist_lookup(list_2, temp->data) != 0 && slist_lookup(result, temp->data) == 0)
         {
             slist_add_tail(result, temp->data);
         }

@@ -22,7 +22,11 @@ List *dlist_new()
 // Purpose : delete the entire linked list and release its memory
 List *dlist_free(List *list)
 {
+    if (list == NULL)
+        return NULL;
+
     Node *cur, *p;
+
     if (dlist_length(list) > 0)
     {
         assert(list->head && list->tail);
@@ -38,7 +42,9 @@ List *dlist_free(List *list)
             --list->length;
         }
     }
-    return list;
+    free(list);
+
+    return NULL;
 }
 
 /*
@@ -99,6 +105,9 @@ uint32_t dlist_lookup(const List *list, int32_t key)
 
 List *dlist_add_tail(List *list, int32_t data)
 {
+    if (list == NULL)
+        return NULL;
+
     Node *node = __list_node_new__(data);
     node->prev = list->tail;
 
@@ -118,17 +127,24 @@ List *dlist_add_tail(List *list, int32_t data)
 
 List *dlist_delete_head(List *list)
 {
-    Node *node;
+    if (list == NULL)
+        return NULL;
+
     if (list->head != NULL)
     {
-        assert(list->length > 0);
+        Node *node;
         node = list->head;
+        assert(list->length > 0);
         list->head = list->head->next;
         --list->length;
         if (list->head == NULL)
         {
             list->tail = NULL;
             assert(list->length == 0);
+        }
+        else
+        {
+            list->head->prev = NULL;
         }
         free(node);
     }
@@ -141,10 +157,9 @@ List *dlist_delete_tail(List *list)
     if (list == NULL)
         return NULL;
 
-    Node *tail = list->tail;
-    Node *node;
     if (list->tail != NULL)
     {
+        Node *tail = list->tail;
         assert(list->length > 0);
         if (list->tail == list->head)
         {
@@ -152,10 +167,10 @@ List *dlist_delete_tail(List *list)
         }
         else
         {
-            list->tail = node->prev;
+            list->tail = list->tail->prev;
             list->tail->next = NULL;
-            free(tail);
         }
+        free(tail);
         --list->length;
     }
     return list;

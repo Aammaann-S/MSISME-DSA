@@ -77,3 +77,21 @@ Stack *stack_peek(const Stack *stk, StackResult *result)
     }
     return stk;
 }
+
+void stack_display_key(const Stack *stk, int32_t key)
+{
+    int32_t i;
+
+    assert(stk != NULL);
+
+    for (i = stk->top; i >= 0; --i)
+    {
+        if (stk->data[i] == key)
+        {
+            printf("Key found: %d\n", key);
+            return;
+        }
+    }
+
+    printf("Key not found: %d\n", key);
+}
