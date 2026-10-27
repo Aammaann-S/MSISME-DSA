@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stddef.h>
 #include <assert.h>
 #include "queue_a.h"

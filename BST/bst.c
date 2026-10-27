@@ -4,7 +4,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "bst.h"
-// #include "stackll.h"
+// #include "stack_a.h"
+#include "queue_a.h"
 
 BST bst_new()
 {
@@ -222,7 +223,7 @@ BST *bst_traversal_inorder_iterative(BST *tree)
     // Stack *stk = stack_node(0);
     // StackResult res;
     // TreeNode *root = tree->root;
-    // while (..root != NULL || !stack_empty(&stk))
+    // while (root != NULL || !stack_empty(&stk))
     // {
     //     if (root)
     //     {
@@ -247,30 +248,30 @@ But here we need to use our own queue
 */
 BST *bst_traversal_level_order(BST *tree)
 {
-    // Queue q = queue_new(0);
-    // QueueResult res;
-    // TreeNode *root = tree->root;
-    // queue_add(&q, root, &res);
-    // for (;;)
-    // {
-    //     queue_remove(&q, &res);
-    //     if (root)
-    //     {
-    //         printf("%d/t", root->key);
-    //     }
-    //     if (root->left)
-    //     {
-    //         queue_add(&q, root->left, &res);
-    //     }
-    //     if (root->right)
-    //     {
-    //         queue_add(&q, root->right, &res);
-    //     }
-    //     else
-    //     {
-    //         break;
-    //     }
-    // }
+    Queue q = queue_new(0);
+    QueueResult res;
+    TreeNode *root = tree->root;
+    queue_add(&q, root, &res);
+    for (;;)
+    {
+        queue_remove(&q, &res);
+        if (root)
+        {
+            printf("%d/t", root->key);
+        }
+        if (root->left)
+        {
+            queue_add(&q, root->left, &res);
+        }
+        if (root->right)
+        {
+            queue_add(&q, root->right, &res);
+        }
+        else
+        {
+            break;
+        }
+    }
     return tree;
 }
 
